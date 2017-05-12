@@ -1,0 +1,138 @@
+﻿<Window xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:oxy="http://Epxoxy.org/precontrols"
+        xmlns:xoxy="http://Epxoxy.org/controls"
+        xmlns:helper="http://Epxoxy.org/helpers"
+        xmlns:behaviors="http://Epxoxy.org/behaviors"
+        xmlns:converters="http://Epxoxy.org/converters"
+        xmlns:sys="clr-namespace:System;assembly=mscorlib"
+        xmlns:array="clr-namespace:System.Collections;assembly=mscorlib"
+        xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
+        xmlns:views="clr-namespace:MailApp.Views"
+        xmlns:app="clr-namespace:MailApp"
+        xmlns:vm="clr-namespace:MailApp.ViewModel"
+        x:Name="window" xmlns:ei="http://schemas.microsoft.com/expression/2010/interactions"
+        x:Class="MailApp.MainWindow"
+        mc:Ignorable="d"
+        xoxy:WindowHelper.ShowIcon="False"
+        WindowStartupLocation="CenterScreen"
+        MinHeight="500" MinWidth="500"
+        Title="MailApp"
+        Height="600"
+        Width="900">
+    <Window.Resources>
+        <converters:BooleanSelectorConverter x:Key="ctlSelector">
+            <converters:BooleanSelectorConverter.TrueValue>
+                <app:NavigationMessage  PageType="{x:Type views:SettingPage}"/>
+            </converters:BooleanSelectorConverter.TrueValue>
+            <converters:BooleanSelectorConverter.FalseValue>
+                <app:OverlayMessage OverlayType="{x:Type views:LoginPane}"/>
+            </converters:BooleanSelectorConverter.FalseValue>
+        </converters:BooleanSelectorConverter>
+    </Window.Resources>
+    <xoxy:DelayFitSizeWrapper>
+        <Grid DataContext="{x:Static app:ViewModelLocator.Main}" ManipulationBoundaryFeedback="OnManipulationBoundaryFeedback">
+            <i:Interaction.Triggers>
+                <i:EventTrigger EventName="Unloaded" SourceObject="{Binding ElementName=window}">
+                    <i:InvokeCommandAction Command="{Binding LogoutCommand}" />
+                </i:EventTrigger>
+            </i:Interaction.Triggers>
+            <oxy:SplitView x:Name="splitView" DisplayMode="CompactOverlay" OpenPaneLength="256">
+                <oxy:SplitView.Pane>
+                    <Grid Background="{x:Null}">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition />
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        <Button Margin="0,48,0,0" Height="48" FontSize="16" HorizontalContentAlignment="Left"
+                                    ContentTemplate="{StaticResource IconItemTemplate}"
+                                    Command="{Binding AddNewDraftCommand}"
+                                    CommandParameter="{x:Type views:DraftPage}"
+                                    Style="{StaticResource TransparentToGrayButtonStyle}">
+                            <app:NavItem Icon="&#xE698;" Label="New Mail" />
+                        </Button>
+                        <ListView x:Name="listview" Grid.Row="1" Padding="0" Background="{x:Null}" 
+                                  ScrollViewer.CanContentScroll="True"
+                                  Style="{StaticResource LightListViewStyle}" 
+                                  SelectedValuePath="PageType"
+                                  ItemTemplate="{StaticResource IconItemTemplate}">
+                            <ListView.ItemContainerStyle>
+                                <Style TargetType="{x:Type ListViewItem}" BasedOn="{StaticResource PipeListViewItemStyle}">
+                                    <Setter Property="Height" Value="48" />
+                                </Style>
+                            </ListView.ItemContainerStyle>
+                            <i:Interaction.Triggers>
+                                <i:EventTrigger EventName="SelectionChanged">
+                                    <i:InvokeCommandAction Command="{x:Static oxy:SplitView.CloseCommand}"/>
+                                </i:EventTrigger>
+                            </i:Interaction.Triggers>
+                            <app:NavItem Icon="&#xE81e;" Label="Inbox" PageType="{x:Type views:InboxPage}"/>
+                            <app:NavItem Icon="&#xE822;" Label="Outbox" PageType="{x:Type views:OutboxPage}"/>
+                            <app:NavItem Icon="&#xE730;" Label="Draft" PageType="{x:Type views:DraftPage}"/>
+                        </ListView>
+                        <WrapPanel Grid.Row="2">
+                            <Rectangle Fill="LightGray" Height="1" Width="256"/>
+                            <Button Width="160" Height="48" FontSize="16" HorizontalContentAlignment="Left"
+                                        ContentTemplate="{StaticResource IconItemTemplate}"
+                                        Style="{StaticResource TransparentToGrayButtonStyle}"
+                                        Command="{Binding NavigationInMainCommand}"
+                                        CommandParameter="{Binding IsLogined, Converter={StaticResource ctlSelector}}">
+                                <xoxy:IconItem Icon="&#xE6FB;" Label="{Binding DisplayName,Source={x:Static app:ViewModelLocator.Main}}"/>
+                            </Button>
+                            <Button Width="48" Height="48" FontSize="16" HorizontalContentAlignment="Left"
+                                        ContentTemplate="{StaticResource IconItemTemplate}"
+                                        Style="{StaticResource TransparentToGrayButtonStyle}"
+                                        Command="{Binding NavigationInMainCommand}">
+                                <Button.CommandParameter>
+                                    <app:NavigationMessage  PageType="{x:Type views:LogPage}"/>
+                                </Button.CommandParameter>
+                                <xoxy:IconItem Icon="&#xE6A8;" Label="Smile"/>
+                            </Button>
+                            <Button x:Name="btn" Width="48" Height="48" FontSize="16" HorizontalContentAlignment="Left"
+                                        ContentTemplate="{StaticResource IconItemTemplate}" 
+                                        Command="{Binding NavigationInMainCommand}"
+                                        Style="{StaticResource TransparentToGrayButtonStyle}">
+                                <Button.CommandParameter>
+                                    <app:NavigationMessage PageType="{x:Type views:SettingPage}"/>
+                                </Button.CommandParameter>
+                                <xoxy:IconItem Icon="&#xE6FE;" Label="Settings"/>
+                            </Button>
+                        </WrapPanel>
+                    </Grid>
+                </oxy:SplitView.Pane>
+                <Grid Background="White">
+                    <Frame x:Name="navFrame" JournalOwnership="OwnsJournal" Grid.Row="1" NavigationUIVisibility="Hidden">
+                        <i:Interaction.Behaviors>
+                            <app:TypeNavigateBehavior NavigateTarget="{Binding SelectedValue, ElementName=listview, Mode=TwoWay}"/>
+                        </i:Interaction.Behaviors>
+                    </Frame>
+                    <TextBox x:Name="content" Visibility="Collapsed"/>
+                </Grid>
+            </oxy:SplitView>
+            <Button HorizontalAlignment="Left" VerticalAlignment="Top" Height="48"
+                        Style="{StaticResource TransparentToGrayButtonStyle}"
+                        Command="{x:Static oxy:SplitView.ChangedOpenStateCommand}"
+                        CommandTarget="{Binding ElementName=splitView}"
+                        ContentTemplate="{StaticResource IconItemTemplate}">
+                <xoxy:IconItem Icon="&#xE605;"/>
+            </Button>
+            <ProgressBar Style="{StaticResource LightProgressBarStyle}" Value="0" Height="5"
+                             Visibility="{Binding IsIndeterminate, RelativeSource={RelativeSource Self}, Converter={StaticResource boolToHidden}}"
+                             IsIndeterminate="{Binding IsRequesting}" Width="500" VerticalAlignment="Bottom" Margin="0,2"/>
+            <AdornerDecorator>
+                <Grid x:Name="overlayRoot" />
+            </AdornerDecorator>
+            <Grid x:Name="loadingRoot" Background="#bbf4f4f4" Visibility="{Binding IsIndeterminate, ElementName=loadingBar, Converter={StaticResource boolToVisible}}">
+                <TextBlock Text="Login" Visibility="{Binding IsLogined, Converter={StaticResource boolToCollapsed}}" Style="{StaticResource TipsTextBlockStyle}" Margin="0,0,0,100"/>
+                <TextBlock Text="Fetching message" Visibility="{Binding IsLogined, Converter={StaticResource boolToVisible}}" Style="{StaticResource TipsTextBlockStyle}" Margin="0,0,0,100"/>
+                <ProgressBar x:Name="loadingBar" Style="{StaticResource LightProgressBarStyle}" Value="0" Height="5"
+                                 Visibility="{Binding IsIndeterminate, RelativeSource={RelativeSource Self}, Converter={StaticResource boolToHidden}}"
+                                 IsIndeterminate="{Binding IsLandingIn}" Width="500"/>
+            </Grid>
+            <xoxy:Toast x:Name="toast" FontSize="15" HorizontalAlignment="Right" VerticalAlignment="Top" Width="300" MaxHeight="200"/>
+        </Grid>
+    </xoxy:DelayFitSizeWrapper>
+</Window>

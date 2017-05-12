@@ -1,0 +1,257 @@
+﻿<Page x:Class="MailApp.Views.EditMailPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+      xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
+      xmlns:ei="http://schemas.microsoft.com/expression/2010/interactions"
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+      xmlns:helper="http://Epxoxy.org/helpers"
+      xmlns:xoxy="http://Epxoxy.org/controls"
+      xmlns:app="clr-namespace:MailApp"
+      xmlns:vm="clr-namespace:MailApp.ViewModel"
+      xmlns:local="clr-namespace:MailApp.Views"
+      mc:Ignorable="d"
+      d:DesignHeight="540" d:DesignWidth="500"
+      Title="NewMailPage">
+    <Page.Resources>
+        <Style x:Key="HorizontalHeaderStyle" TargetType="{x:Type HeaderedContentControl}">
+            <Setter Property="BorderBrush" Value="LightGray" />
+            <Setter Property="BorderThickness" Value="0,0,0,1" />
+            <Setter Property="Padding" Value="0,7" />
+            <Setter Property="Focusable" Value="False" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type HeaderedContentControl}">
+                        <Border BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}"
+                                Padding="{TemplateBinding Padding}">
+                            <StackPanel Orientation="Horizontal">
+                                <ContentPresenter ContentSource="Header" TextBlock.FontSize="15"
+                                                  TextBlock.Foreground="DimGray"/>
+                                <ContentPresenter/>
+                            </StackPanel>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Page.Resources>
+    <i:Interaction.Triggers>
+        <i:EventTrigger EventName="Unloaded">
+            <i:InvokeCommandAction Command="{Binding SaveDraftCommand}" 
+                                       CommandParameter="{Binding Document, ElementName=rich, Mode=OneWay}" />
+        </i:EventTrigger>
+    </i:Interaction.Triggers>
+    <Grid x:Name="Root" Background="White">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto"/>
+            <RowDefinition />
+            <RowDefinition Height="auto"/>
+        </Grid.RowDefinitions>
+        <ItemsControl Margin="6,0">
+            <HeaderedContentControl Header="From:" Style="{StaticResource HorizontalHeaderStyle}">
+                <TextBox Text="{Binding FromAddress, Mode=OneWay}" VerticalAlignment="Center" BorderThickness="0" IsReadOnly="True" MinWidth="120" Margin="4,0" TextWrapping="Wrap"/>
+            </HeaderedContentControl>
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <HeaderedContentControl Header="To:" Style="{StaticResource HorizontalHeaderStyle}">
+                    <TextBox Text="{Binding MailMessage.ToAddresses}" VerticalAlignment="Center" BorderThickness="0" MinWidth="120" Margin="4,0" TextWrapping="Wrap"/>
+                </HeaderedContentControl>
+                <ToggleButton x:Name="ccbccToggle" Grid.Column="1" Padding="7,0" Content="CC/Bcc" Style="{StaticResource DarkToggleButtonStyle}"
+                              IsChecked="{Binding IsCCOrBccEnabled}"/>
+            </Grid>
+            <ItemsControl Visibility="{Binding IsChecked, ElementName=ccbccToggle, Converter={StaticResource boolToVisible}}">
+                <HeaderedContentControl Header="CC:" Style="{StaticResource HorizontalHeaderStyle}">
+                    <TextBox Text="{Binding MailMessage.CCAddresses}" VerticalAlignment="Center" BorderThickness="0" MinWidth="120" Margin="4,0" TextWrapping="Wrap"/>
+                </HeaderedContentControl>
+                <HeaderedContentControl Header="Bcc:" Style="{StaticResource HorizontalHeaderStyle}">
+                    <TextBox Text="{Binding MailMessage.BccAddresses}" VerticalAlignment="Center" BorderThickness="0" MinWidth="120" Margin="4,0" TextWrapping="Wrap"/>
+                </HeaderedContentControl>
+            </ItemsControl>
+            <HeaderedContentControl Header="Subject:" Style="{StaticResource HorizontalHeaderStyle}">
+                <TextBox Text="{Binding MailMessage.Subject}" VerticalAlignment="Center" BorderThickness="0" MinWidth="120" Margin="4,0" TextWrapping="Wrap"/>
+            </HeaderedContentControl>
+        </ItemsControl>
+        <Grid Grid.Row="1" Margin="4,7,4,0">
+            <Grid ClipToBounds="True">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="auto"/>
+                    <RowDefinition />
+                </Grid.RowDefinitions>
+                <Rectangle Stroke="#b8c3cb" StrokeThickness="1" Grid.RowSpan="2" SnapsToDevicePixels="True"/>
+                <Border CornerRadius="3" SnapsToDevicePixels="True" ClipToBounds="True">
+                    <WrapPanel Orientation="Horizontal" TextBlock.FontSize="18" Margin="1,1">
+                        <WrapPanel.Resources>
+                            <ControlTemplate x:Key="ButtonBaseTemplateKey" TargetType="{x:Type ButtonBase}">
+                                <Border x:Name="border" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Background="{TemplateBinding Background}" SnapsToDevicePixels="True">
+                                    <ContentPresenter x:Name="contentPresenter" ContentTemplate="{TemplateBinding ContentTemplate}" Content="{TemplateBinding Content}" ContentStringFormat="{TemplateBinding ContentStringFormat}" Focusable="False" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" Margin="{TemplateBinding Padding}" RecognizesAccessKey="True" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
+                                </Border>
+                                <ControlTemplate.Triggers>
+                                    <Trigger Property="Button.IsDefaulted" Value="True">
+                                        <Setter Property="BorderBrush" TargetName="border" Value="{DynamicResource {x:Static SystemColors.HighlightBrushKey}}"/>
+                                    </Trigger>
+                                    <Trigger Property="IsMouseOver" Value="True">
+                                        <Setter Property="Background" TargetName="border" Value="White"/>
+                                    </Trigger>
+                                    <Trigger Property="IsPressed" Value="True">
+                                        <Setter Property="Background" TargetName="border" Value="#FFC4E5F6"/>
+                                    </Trigger>
+                                    <Trigger Property="ToggleButton.IsChecked" Value="True">
+                                        <Setter Property="Background" TargetName="border" Value="#FFBCDDEE"/>
+                                    </Trigger>
+                                    <Trigger Property="IsEnabled" Value="False">
+                                        <Setter Property="Background" TargetName="border" Value="#FFF4F4F4"/>
+                                        <Setter Property="BorderBrush" TargetName="border" Value="#FFADB2B5"/>
+                                        <Setter Property="TextElement.Foreground" TargetName="contentPresenter" Value="#FF838383"/>
+                                    </Trigger>
+                                </ControlTemplate.Triggers>
+                            </ControlTemplate>
+                            <Style TargetType="{x:Type Button}">
+                                <Setter Property="BorderBrush" Value="#b8c3cb" />
+                                <Setter Property="BorderThickness" Value="1" />
+                                <Setter Property="Margin" Value="-1,-1,0,0" />
+                                <Setter Property="Width" Value="40" />
+                                <Setter Property="Height" Value="31" />
+                                <Setter Property="Background" Value="#f2f4f8" />
+                                <Setter Property="SnapsToDevicePixels" Value="True" />
+                                <Setter Property="Template" Value="{StaticResource ButtonBaseTemplateKey}" />
+                            </Style>
+                            <Style TargetType="{x:Type ToggleButton}">
+                                <Setter Property="BorderBrush" Value="#b8c3cb" />
+                                <Setter Property="BorderThickness" Value="1" />
+                                <Setter Property="Margin" Value="-1,-1,0,0" />
+                                <Setter Property="Width" Value="40" />
+                                <Setter Property="Height" Value="31" />
+                                <Setter Property="Background" Value="#f2f4f8" />
+                                <Setter Property="SnapsToDevicePixels" Value="True" />
+                                <Setter Property="Template" Value="{StaticResource ButtonBaseTemplateKey}" />
+                            </Style>
+                        </WrapPanel.Resources>
+                        <ToggleButton FontFamily="Consolas" Content="B"
+                                      Command="{x:Static EditingCommands.ToggleBold}"
+                                      CommandTarget="{Binding ElementName=rich}"/>
+                        <ToggleButton FontFamily="Consolas" Content="I" FontStyle="Italic"
+                                      Command="{x:Static EditingCommands.ToggleItalic}"
+                                      CommandTarget="{Binding ElementName=rich}"/>
+                        <ToggleButton FontFamily="Consolas"
+                                      Command="{x:Static EditingCommands.ToggleUnderline}"
+                                      CommandTarget="{Binding ElementName=rich}">
+                            <TextBlock Text="U" TextDecorations="Underline"/>
+                        </ToggleButton>
+                        <Button FontFamily="Consolas" Content="A+"
+                                Command="{x:Static EditingCommands.IncreaseFontSize}"
+                                CommandTarget="{Binding ElementName=rich}"/>
+                        <Button FontFamily="Consolas" Content="A-" Width="40"
+                                Command="{x:Static EditingCommands.DecreaseFontSize}"
+                                CommandTarget="{Binding ElementName=rich}"/>
+                        <Button Command="{x:Static EditingCommands.AlignLeft}"
+                                CommandTarget="{Binding ElementName=rich}">
+                            <Canvas Width="16" Height="8">
+                                <Canvas.CacheMode>
+                                    <BitmapCache SnapsToDevicePixels="True"/>
+                                </Canvas.CacheMode>
+                                <Line X1="0" X2="16" Stroke="Black"/>
+                                <Line Canvas.Top="4" X1="0" X2="10" Stroke="Black"/>
+                                <Line Canvas.Top="8" X1="0" X2="16" Stroke="Black"/>
+                            </Canvas>
+                        </Button>
+                        <Button Command="{x:Static EditingCommands.AlignCenter}"
+                                CommandTarget="{Binding ElementName=rich}">
+                            <Canvas Width="16" Height="8">
+                                <Canvas.CacheMode>
+                                    <BitmapCache SnapsToDevicePixels="True"/>
+                                </Canvas.CacheMode>
+                                <Line X1="0" X2="16" Stroke="Black"/>
+                                <Line Canvas.Top="4" X1="3" X2="13" Stroke="Black"/>
+                                <Line Canvas.Top="8" X1="0" X2="16" Stroke="Black"/>
+                            </Canvas>
+                        </Button>
+                        <Button Command="{x:Static EditingCommands.AlignRight}"
+                                CommandTarget="{Binding ElementName=rich}">
+                            <Canvas Width="16" Height="8">
+                                <Canvas.CacheMode>
+                                    <BitmapCache SnapsToDevicePixels="True"/>
+                                </Canvas.CacheMode>
+                                <Line X1="0" X2="16" Stroke="Black"/>
+                                <Line Canvas.Top="4" X1="6" X2="16" Stroke="Black"/>
+                                <Line Canvas.Top="8" X1="0" X2="16" Stroke="Black"/>
+                            </Canvas>
+                        </Button>
+                        <Button Command="{x:Static EditingCommands.AlignJustify}"
+                                CommandTarget="{Binding ElementName=rich}">
+                            <Canvas Width="16" Height="8">
+                                <Canvas.CacheMode>
+                                    <BitmapCache SnapsToDevicePixels="True"/>
+                                </Canvas.CacheMode>
+                                <Line X1="0" X2="16" Stroke="Black"/>
+                                <Line Canvas.Top="4" X1="0" X2="16" Stroke="Black"/>
+                                <Line Canvas.Top="8" X1="0" X2="16" Stroke="Black"/>
+                            </Canvas>
+                        </Button>
+                    </WrapPanel>
+                </Border>
+                <Grid Grid.Row="1">
+                    <Grid.RowDefinitions>
+                        <RowDefinition />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+                    <RichTextBox x:Name="rich" Margin="1" Padding="4" BorderThickness="0" Background="White"
+                             TextBlock.LineHeight="1" AcceptsReturn="True" AcceptsTab="True" FontFamily="Microsoft YaHei" />
+                    <Line Grid.Row="1" X1="0" X2="10" Height="1" Stretch="Fill" Stroke="LightGray" StrokeThickness="1" SnapsToDevicePixels="True" Margin="4,0"
+                          HorizontalAlignment="Left" VerticalAlignment="Top" Width="150" StrokeDashArray="10 5"/>
+                    <TextBlock Grid.Row="1" Margin="4,7,4,4" Text="{Binding Items.Count, ElementName=itemsCtl, StringFormat='Attachments ( {0} Items)'}" VerticalAlignment="Center" TextBlock.FontSize="15" TextBlock.Foreground="DimGray"
+                               AllowDrop="True" Drop="AttachmentsDrop"/>
+                    <ItemsControl x:Name="itemsCtl" Grid.Row="2" Margin="4,0" ItemsSource="{Binding MailMessage.Attachments}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Grid Margin="0,2">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="auto"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Text="{Binding}" VerticalAlignment="Center"/>
+                                    <Button Margin="7,0" Grid.Column="1" Content="Delete" Style="{StaticResource ForegroundChangeBtnStyle}"
+                                            Command="{Binding DataContext.DeleteAttachmentCommand,RelativeSource={RelativeSource AncestorType={x:Type ItemsControl}}}"
+                                            CommandParameter="{Binding}"/>
+                                </Grid>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </Grid>
+            </Grid>
+        </Grid>
+        <Grid Grid.Row="2">
+            <Line VerticalAlignment="Top" Margin="4,0" X1="0" X2="100" Stretch="Fill" Stroke="LightGray" StrokeThickness="1" Height="1"/>
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="4,0">
+                <Button Style="{StaticResource TransparentToGrayButtonStyle}" Padding="0,4,12,4"
+                        Click="GoBackBtnClick"
+                        Command="{Binding SaveDraftCommand}" 
+                        CommandParameter="{Binding Document, ElementName=rich, Mode=OneWay}"
+                        ContentTemplate="{StaticResource IconItemTemplate}">
+                    <xoxy:IconItem Label="Back" Icon="&#xe786;" />
+                </Button>
+                <Button Style="{StaticResource TransparentToGrayButtonStyle}" Padding="0,4,12,4"
+                        Command="{Binding DiscardCommand}"
+                        Click="GoBackBtnClick"
+                        ContentTemplate="{StaticResource IconItemTemplate}">
+                    <xoxy:IconItem Label="Discard" Icon="&#xe6ec;"/>
+                </Button>
+                <Button Grid.Column="1" HorizontalContentAlignment="Left"
+                        Click="AddAttachmentBtnClick"
+                        ContentTemplate="{StaticResource IconItemTemplate}"
+                        Style="{StaticResource TransparentToGrayButtonStyle}">
+                    <xoxy:IconItem Icon="&#xE698;" Label="Attachments" />
+                </Button>
+                <Button Command="{Binding SendMailCommand}"
+                        CommandParameter="{Binding Document, ElementName=rich}"
+                        Style="{StaticResource TransparentToGrayButtonStyle}" Padding="0,4,12,4"
+                        ContentTemplate="{StaticResource IconItemTemplate}">
+                    <xoxy:IconItem Label="Send" Icon="&#xe81d;"/>
+                </Button>
+            </StackPanel>
+        </Grid>
+    </Grid>
+</Page>

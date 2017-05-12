@@ -1,0 +1,47 @@
+﻿<xoxy:MaskControl x:Class="MailApp.Views.Welcome"
+                  xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+                  xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+                  xmlns:xoxy="http://Epxoxy.org/controls"
+                  xmlns:theme="clr-namespace:Microsoft.Windows.Themes;assembly=PresentationFramework.Aero2"
+                  xmlns:views="clr-namespace:MailApp.Views"
+                  xmlns:app="clr-namespace:MailApp"
+                  HorizontalAlignment="Stretch"
+                  HorizontalContentAlignment="Stretch"
+                  IsLightDismissEnabled="False"
+                  IsOpen="True"
+                  mc:Ignorable="d"
+                  d:DesignHeight="500" d:DesignWidth="500">
+    <Grid>
+        <Grid.Background>
+            <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                <LinearGradientBrush.GradientStops>
+                    <GradientStop Color="#a0b084" Offset="0"/>
+                    <GradientStop Color="#3ea698" Offset="1"/>
+                </LinearGradientBrush.GradientStops>
+            </LinearGradientBrush>
+        </Grid.Background>
+        <ItemsControl VerticalAlignment="Center" DataContext="{x:Static app:ViewModelLocator.Main}">
+            <TextBlock Text="Welcome" Foreground="White" Style="{StaticResource TipsTextBlockStyle}" FontSize="60"/>
+            <TextBlock Text="Set an account to start" Foreground="White" Style="{StaticResource TipsTextBlockStyle}" FontSize="18" Margin="0,20"/>
+            <Button Grid.Row="1" Content="{app:SettingBinding LastLogUser, Mode=OneWay, FallbackValue='No exist account'}"
+                    Command="{Binding LoginIfAutoCommand}" 
+                    CommandParameter="{x:Type views:LoginPane}"
+                    Style="{StaticResource SimpleNormalButtonStyle}"
+                    Background="WhiteSmoke" HorizontalAlignment="Center"
+                    Height="36" MaxWidth="300" MinWidth="240" Margin="0,30,0,20"
+                    SnapsToDevicePixels="True" />
+            <Button x:Name="new"
+                    Command="{Binding NavigationInMainCommand}" 
+                    Grid.Row="2" Content="New Account" 
+                    Style="{StaticResource SimpleNormalButtonStyle}"
+                    Height="36" MaxWidth="300" MinWidth="240"
+                    Background="WhiteSmoke" HorizontalAlignment="Center" SnapsToDevicePixels="True">
+                <Button.CommandParameter>
+                    <app:OverlayMessage OverlayType="{x:Type views:LoginPane}"/>
+                </Button.CommandParameter>
+            </Button>
+        </ItemsControl>
+    </Grid>
+</xoxy:MaskControl>

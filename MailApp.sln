@@ -1,0 +1,28 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.25420.1
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MailApp", "MailApp\MailApp.csproj", "{3CCE6D52-4188-4C62-856C-A417AD1587E9}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mail", "Mail\Mail.csproj", "{4B57ED93-EB4E-46DA-810A-6FC7EE27B6FD}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{3CCE6D52-4188-4C62-856C-A417AD1587E9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3CCE6D52-4188-4C62-856C-A417AD1587E9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3CCE6D52-4188-4C62-856C-A417AD1587E9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3CCE6D52-4188-4C62-856C-A417AD1587E9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4B57ED93-EB4E-46DA-810A-6FC7EE27B6FD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4B57ED93-EB4E-46DA-810A-6FC7EE27B6FD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4B57ED93-EB4E-46DA-810A-6FC7EE27B6FD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4B57ED93-EB4E-46DA-810A-6FC7EE27B6FD}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

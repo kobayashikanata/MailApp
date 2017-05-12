@@ -1,0 +1,22 @@
+﻿<Page x:Class="MailApp.Views.LogPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:local="clr-namespace:MailApp.Views"
+      xmlns:app="clr-namespace:MailApp"
+      mc:Ignorable="d"
+      Background="White"
+      d:DesignHeight="300" d:DesignWidth="300"
+      Title="LogPage">
+    <Grid Margin="4,0,0,0">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition />
+        </Grid.RowDefinitions>
+        <TextBlock Margin="4,7,0,7" Foreground="DimGray" FontSize="20" Text="Logs" />
+        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto"
+                      HorizontalScrollBarVisibility="Auto"
+                      Content="{Binding Output, Source={x:Static app:App.LogTracker}}" />
+    </Grid>
+</Page>
